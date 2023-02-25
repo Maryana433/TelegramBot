@@ -62,6 +62,7 @@ public class UpdateController {
         setView(sendMessage);
     }
 
+    // send message to Telegram
     private void processTextMessage(Update update) {
         log.debug("Process Text Message");
 
@@ -96,7 +97,7 @@ public class UpdateController {
     }
 
 
-    private void setView(SendMessage sendMessage) {
+    public void setView(SendMessage sendMessage) {
         telegramBot.sendAnswerMessage(sendMessage);
     }
 }

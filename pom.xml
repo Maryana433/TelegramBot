@@ -11,6 +11,7 @@
     <modules>
         <module>dispatcher</module>
         <module>common-rabitmq</module>
+        <module>Node</module>
     </modules>
 
     <parent>
@@ -22,6 +23,7 @@
     <properties>
         <maven.compiler.source>15</maven.compiler.source>
         <maven.compiler.target>15</maven.compiler.target>
+        <telegrambot.starter.version>6.1.0</telegrambot.starter.version>
     </properties>
 
     <dependencies>
