@@ -1,6 +1,7 @@
 package by.maryana.service.implementation;
 
 import by.maryana.service.ConsumerService;
+import by.maryana.service.MainService;
 import by.maryana.service.ProduceService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -14,10 +15,10 @@ import static by.maryana.model.RabbitQueue.*;
 @Log4j
 public class ConsumerServiceImpl implements ConsumerService {
 
-    private final ProduceService produceService;
+    private final MainService mainService;
 
-    public ConsumerServiceImpl(ProduceService produceService) {
-        this.produceService = produceService;
+    public ConsumerServiceImpl(MainService mainService) {
+        this.mainService = mainService;
     }
 
     //get message from queue and produce
@@ -25,12 +26,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     @RabbitListener(queues = TEXT_MESSAGE_UPDATE)
     public void consumeTextMessageUpdates(Update update) {
         log.debug("NODE: Text message is received");
-
-        var message = update.getMessage();
-        var sendMessage =  new SendMessage();
-        sendMessage.setChatId(update.getMessage().getChatId());
-        sendMessage.setText("Hello from NODE");
-        produceService.produceAnswer(sendMessage);
+        mainService.processTextMessage(update);
     }
 
     @Override
