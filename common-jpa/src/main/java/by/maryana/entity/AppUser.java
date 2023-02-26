@@ -1,6 +1,6 @@
 package by.maryana.entity;
 
-import by.maryana.entity.enums.UserState;
+import by.maryana.service.enums.UserState;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
