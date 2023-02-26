@@ -1,6 +1,6 @@
 package by.maryana.dao;
 
-import by.maryana.entities.RawData;
+import by.maryana.entity.RawData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

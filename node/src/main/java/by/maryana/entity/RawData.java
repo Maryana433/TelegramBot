@@ -1,4 +1,4 @@
-package by.maryana.entities;
+package by.maryana.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
