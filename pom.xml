@@ -13,6 +13,7 @@
         <module>common-rabitmq</module>
         <module>Node</module>
         <module>common-jpa</module>
+        <module>rest-service</module>
     </modules>
 
     <parent>
