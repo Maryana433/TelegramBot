@@ -8,6 +8,7 @@ import by.maryana.entity.AppUser;
 import by.maryana.entity.RawData;
 import by.maryana.exceptions.UploadFileException;
 import by.maryana.service.FileService;
+import by.maryana.service.enums.LinkType;
 import by.maryana.service.enums.ServiceCommands;
 import by.maryana.service.enums.UserState;
 import by.maryana.service.MainService;
@@ -79,7 +80,8 @@ public class MainServiceImpl implements MainService {
 
         try{
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            String answer = "Photo has been uploaded successfully! link do download : ";
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);
+            String answer = "Photo has been uploaded successfully! link do download : " + link;
             sendAnswer(answer, chatId);
         }catch (UploadFileException e){
             log.error(e);
@@ -99,7 +101,8 @@ public class MainServiceImpl implements MainService {
 
         try{
             AppDocument doc = fileService.processDoc(update.getMessage());
-            String answer = "Document has been uploaded successfully! link do download : ";
+            String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);
+            String answer = "Document has been uploaded successfully! link do download : " + link;
             sendAnswer(answer, chatId);
         }catch (UploadFileException e){
             log.error(e);

@@ -8,6 +8,8 @@ import by.maryana.entity.AppPhoto;
 import by.maryana.entity.BinaryContent;
 import by.maryana.exceptions.UploadFileException;
 import by.maryana.service.FileService;
+import by.maryana.service.enums.LinkType;
+import by.maryana.utils.CryptoTool;
 import lombok.extern.log4j.Log4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,16 +35,20 @@ public class FileServiceImpl implements FileService {
     private String fileInfoUri;
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
+    @Value("${rest-service.link}")
+    private String serviceLink;
 
     private final AppDocumentDAO appDocumentDAO;
     private final AppPhotoDAO appPhotoDAO;
     private final BinaryContentDAO binaryContentDAO;
+    private final CryptoTool cryptoTool;
 
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, AppPhotoDAO appPhotoDAO, BinaryContentDAO binaryContentDAO, CryptoTool cryptoTool) {
         this.appDocumentDAO = appDocumentDAO;
         this.appPhotoDAO = appPhotoDAO;
         this.binaryContentDAO = binaryContentDAO;
+        this.cryptoTool = cryptoTool;
     }
 
     @Override
@@ -89,6 +95,13 @@ public class FileServiceImpl implements FileService {
         }else{
             throw new UploadFileException("Bad response from telegram service: "  + response);
         }
+    }
+
+    @Override
+    public String generateLink(Long fileId, LinkType linkType) {
+        String hash = cryptoTool.encode(fileId);
+        String link = "http://"+serviceLink+"/" +linkType+"?id="+hash;
+        return link;
     }
 
     private AppPhoto buildTransientAppPhoto(PhotoSize telegramPhoto, BinaryContent persistentBinaryContent) {
