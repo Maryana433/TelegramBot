@@ -12,13 +12,8 @@ public enum ServiceCommands {
         this.cmd = cmd;
     }
 
-    public static ServiceCommands fromValue(String otherCmd) {
-        for(ServiceCommands s :ServiceCommands.values()){
-            if(s.cmd.equals(otherCmd)){
-                return s;
-            }
-        }
-        return null;
+    public boolean equals(String cmd){
+        return this.cmd.equals(cmd);
     }
 
     @Override

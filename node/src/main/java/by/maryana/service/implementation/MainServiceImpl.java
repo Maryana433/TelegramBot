@@ -21,6 +21,8 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import java.util.Optional;
+
 import static by.maryana.service.enums.UserState.*;
 import static by.maryana.service.enums.ServiceCommands.*;
 
@@ -32,13 +34,15 @@ public class MainServiceImpl implements MainService {
     private final ProduceService produceService;
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
+    private final AppUserServiceImpl appUserService;
 
     @Autowired
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProduceService produceService, AppUserDAO appUserDAO, FileService fileService) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProduceService produceService, AppUserDAO appUserDAO, FileService fileService, AppUserServiceImpl appUserService) {
         this.rawDataDAO = rawDataDAO;
         this.produceService = produceService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
 
@@ -51,15 +55,15 @@ public class MainServiceImpl implements MainService {
         String text = update.getMessage().getText();
         String output = "";
 
-        ServiceCommands serviceCommand = ServiceCommands.fromValue(text);
-        if(CANCEL.equals(serviceCommand)){
+
+        if(CANCEL.equals(text)){
             output = cancelProcess(appUser);
         }else if(BASIC_STATE.equals(userState)){
             // if our state is Basic - app is waiting for service commands
             output = processServiceCommand(appUser, text);
         }else if(WAIT_FOR_EMAIL_STATE.equals(userState)){
             // if our state is WAIT - app is waiting for users email
-            //TODO add process email
+            output = appUserService.setEmail(appUser, text);
         }else{
            log.error("Unknown user state : " + userState);
             output = "Unknown error. Try again.";
@@ -137,8 +141,7 @@ public class MainServiceImpl implements MainService {
 
     private String processServiceCommand(AppUser appUser, String cmd) {
         if(REGISTRATION.equals(cmd)){
-            //TODO
-            return "Temporarily unavailable";
+            return appUserService.registerUser(appUser);
         }else if(HELP.equals(cmd)){
             return help();
         }else if(START.equals(cmd)){
@@ -169,21 +172,20 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update){
             User telegramUser = update.getMessage().getFrom();
-            AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
-            if(persistentAppUser == null){
+            Optional<AppUser> persistentAppUser = appUserDAO.findByTelegramUserId(telegramUser.getId());
+            if(persistentAppUser.isEmpty()){
                 AppUser transientAppUser = AppUser.builder()
                         .telegramUserId(telegramUser.getId())
                         .userName(telegramUser.getUserName())
                         .firstName(telegramUser.getFirstName())
                         .lastName(telegramUser.getLastName())
-                        // TODO change this value default value after adding registration
-                        .isActive(true)
+                        .isActive(false)
                         .state(BASIC_STATE)
                         .build();
 
                 return appUserDAO.save(transientAppUser);
             }
 
-            return persistentAppUser;
+            return persistentAppUser.get();
     }
 }
