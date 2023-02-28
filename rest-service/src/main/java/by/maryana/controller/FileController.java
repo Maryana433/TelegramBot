@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+
 @RestController
 @RequestMapping("/file")
 @Log4j
@@ -28,44 +33,57 @@ public class FileController {
     }
 
     @GetMapping("/get-doc")
-    public ResponseEntity<?> getDoc(@RequestParam("id") String id){
+    public void getDoc(@RequestParam("id") String id, HttpServletResponse response) throws IOException {
+
         AppDocument appDocument = fileService.getDocument(id);
         // TODO add ControllerAdvice
-        if(appDocument == null)
-            return ResponseEntity.badRequest().build();
+        if (appDocument == null){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return ;
+    }
 
         BinaryContent content = appDocument.getBinaryContent();
-        FileSystemResource file = fileService.getFileSystemResource(content);
 
-        if(file == null)
-            return ResponseEntity.internalServerError().build();
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType(MediaType.parseMediaType(appDocument.getMimType()).toString());
+        response.setHeader("Content-disposition", "attachment; filename="+ appDocument.getDocName());
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(appDocument.getMimType()))
-                // to load file, not open
-                .header("Content-disposition", "attachment; filename=" + appDocument.getDocName())
-                .body(file);
+        try{
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(content.getFileAsArrayOfBytes());
+            outputStream.close();
+        }catch(IOException e){
+            log.error(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
 
     }
 
     @GetMapping("/get-photo")
-    public ResponseEntity<?> getPhoto(@RequestParam("id") String id){
+    public void getPhoto(@RequestParam("id") String id, HttpServletResponse response){
         AppPhoto appPhoto = fileService.getPhoto(id);
         // TODO add ControllerAdvice
-        if(appPhoto == null)
-            return ResponseEntity.badRequest().build();
+        if(appPhoto == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
         BinaryContent content = appPhoto.getBinaryContent();
-        FileSystemResource file = fileService.getFileSystemResource(content);
 
-        if(file == null)
-            return ResponseEntity.internalServerError().build();
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType(MediaType.IMAGE_JPEG.toString());
+        response.setHeader("Content-disposition", "attachment;");
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
-                // to load file, not open
-                .header("Content-disposition", "attachment;")
-                .body(file);
+        try{
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(content.getFileAsArrayOfBytes());
+            outputStream.close();
+        }catch(IOException e){
+            log.error(e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }

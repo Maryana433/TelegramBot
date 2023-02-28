@@ -4,7 +4,10 @@ import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -16,22 +19,32 @@ import javax.annotation.PostConstruct;
 // - нужно платить денежку
 @Component
 @Log4j
-public class TelegramBot extends TelegramLongPollingBot {
+public class TelegramBot extends TelegramWebhookBot {
 
     @Value("${telegram.bot.name}")
     private String botName;
     @Value("${telegram.bot.token}")
     private String botToken;
+    @Value("${telegram.bot.uri}")
+    private String botUri;
 
-    private UpdateController updateController;
+    private UpdateProcessor updateProcessor;
 
-    public TelegramBot(UpdateController updateController) {
-        this.updateController = updateController;
+    public TelegramBot(UpdateProcessor updateProcessor) {
+        this.updateProcessor = updateProcessor;
     }
 
     @PostConstruct
-    public void init(){
-        updateController.registerBot(this);
+    public void init() throws TelegramApiException {
+        updateProcessor.registerBot(this);
+        try{
+            SetWebhook webhook = SetWebhook.builder()
+                    .url(botUri)
+                    .build();
+            this.setWebhook(webhook);
+        }catch(TelegramApiException e){
+            log.error(e);
+        }
     }
 
     @Override
@@ -44,11 +57,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         return botToken;
     }
 
-    // messages from Bot and to Bot
     @Override
-    public void onUpdateReceived(Update update) {
-        updateController.processUpdate(update);
+    public String getBotPath() {
+        return "/update"; // <bot.uri> + </callback> + </update?
     }
+
+//    public void onUpdateReceived(Update update) {
+//        updateProcessor.processUpdate(update);
+//    }
 
     public void sendAnswerMessage(SendMessage message){
         if(message != null){
@@ -59,4 +75,10 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         }
     }
+
+    @Override
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+        return null;
+    }
+
 }

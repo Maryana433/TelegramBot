@@ -22,7 +22,7 @@ public class ActivationController {
     public ResponseEntity<?> activation(@RequestParam("id") String userId){
         boolean isActivate = userActivationService.activation(userId);
         if(isActivate){
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body("Activation your account is completed. You can load documents and photos");
         }
 
         return ResponseEntity.internalServerError().build();

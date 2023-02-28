@@ -1,6 +1,6 @@
 package by.maryana.service.implementation;
 
-import by.maryana.controller.UpdateController;
+import by.maryana.controller.UpdateProcessor;
 import by.maryana.service.AnswerConsumer;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -12,16 +12,16 @@ import static by.maryana.model.RabbitQueue.ANSWER_MESSAGE;
 @Service
 public class AnswerConsumerImpl implements AnswerConsumer {
 
-    private final UpdateController updateController;
+    private final UpdateProcessor updateProcessor;
 
-    public AnswerConsumerImpl(UpdateController updateController) {
-        this.updateController = updateController;
+    public AnswerConsumerImpl(UpdateProcessor updateProcessor) {
+        this.updateProcessor = updateProcessor;
     }
 
     // get answer message and send to bot
     @Override
     @RabbitListener(queues = ANSWER_MESSAGE)
     public void consume(SendMessage sendMessage) {
-        updateController.setView(sendMessage);
+        updateProcessor.setView(sendMessage);
     }
 }
