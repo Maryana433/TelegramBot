@@ -62,6 +62,7 @@ public class TelegramBot extends TelegramWebhookBot {
         return "/update"; // <bot.uri> + </callback> + </update?
     }
 
+    // TelegramLongPollingBot
 //    public void onUpdateReceived(Update update) {
 //        updateProcessor.processUpdate(update);
 //    }

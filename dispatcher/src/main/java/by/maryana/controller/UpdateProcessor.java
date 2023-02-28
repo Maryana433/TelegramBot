@@ -68,15 +68,15 @@ public class UpdateProcessor {
 
         updateProducer.produce(TEXT_MESSAGE_UPDATE, update);
 
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(update.getMessage().getChatId().toString());
-        sendMessage.setText("We get your message - [ " + update.getMessage().getText() + " ]");
-
-        try {
-            telegramBot.execute(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+//        SendMessage sendMessage = new SendMessage();
+//        sendMessage.setChatId(update.getMessage().getChatId().toString());
+//        sendMessage.setText("We get your message - [ " + update.getMessage().getText() + " ]");
+//
+//        try {
+//            telegramBot.execute(sendMessage);
+//        } catch (TelegramApiException e) {
+//            e.printStackTrace();
+//        }
     }
 
 
