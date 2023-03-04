@@ -91,7 +91,5 @@ public class AppUserServiceImpl implements AppUserService {
                 HttpMethod.POST,
                 request,
                 String.class);
-
-
     }
 }

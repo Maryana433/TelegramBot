@@ -116,7 +116,7 @@ public class MainServiceImpl implements MainService {
 
     }
 
-    private boolean isNotAllowToSendContent(String chatId, AppUser appUser) {
+    public boolean isNotAllowToSendContent(String chatId, AppUser appUser) {
             UserState userState = appUser.getState();
             if(!appUser.getIsActive()){
                 String error = "Please register and active your account to download content";
@@ -132,14 +132,14 @@ public class MainServiceImpl implements MainService {
             return false;
     }
 
-    private void sendAnswer(String output, String chatId) {
+    public void sendAnswer(String output, String chatId) {
         SendMessage sendMessage =  new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(output);
         produceService.produceAnswer(sendMessage);
     }
 
-    private String processServiceCommand(AppUser appUser, String cmd) {
+    public String processServiceCommand(AppUser appUser, String cmd) {
         if(REGISTRATION.equals(cmd)){
             return appUserService.registerUser(appUser);
         }else if(HELP.equals(cmd)){
@@ -151,26 +151,26 @@ public class MainServiceImpl implements MainService {
         }
     }
 
-    private String help() {
+    public String help() {
         return "List of available commands:\n"
                 + "/cancel -  canceling the execution of the current command \n"
                 + "/registration - registration of user";
     }
 
-    private String cancelProcess(AppUser appUser) {
+    public String cancelProcess(AppUser appUser) {
         appUser.setState(BASIC_STATE);
         appUserDAO.save(appUser);
         return "Command was canceled";
     }
 
-    private void saveRawData(Update update) {
+    public void saveRawData(Update update) {
         RawData rawData = RawData.builder()
                 .eventFromTelegram(update)
                 .build();
         rawDataDAO.save(rawData);
     }
 
-    private AppUser findOrSaveAppUser(Update update){
+    public AppUser findOrSaveAppUser(Update update){
             User telegramUser = update.getMessage().getFrom();
             Optional<AppUser> persistentAppUser = appUserDAO.findByTelegramUserId(telegramUser.getId());
             if(persistentAppUser.isEmpty()){

@@ -4,17 +4,12 @@ import by.maryana.dao.AppDocumentDAO;
 import by.maryana.dao.AppPhotoDAO;
 import by.maryana.entity.AppDocument;
 import by.maryana.entity.AppPhoto;
-import by.maryana.entity.BinaryContent;
 import by.maryana.service.FileService;
 import by.maryana.utils.CryptoTool;
 import lombok.extern.log4j.Log4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
 
 @Log4j
 @Service

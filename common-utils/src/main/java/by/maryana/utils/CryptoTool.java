@@ -20,7 +20,6 @@ public class CryptoTool {
         if(res != null && res.length > 0){
             return res[0];
         }
-
         return null;
     }
 }
